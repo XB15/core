@@ -1,0 +1,33 @@
+{
+  "name": "@xb-15/core",
+  "version": "0.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "core",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "aarch64-unknown-linux-gnu"
+      ]
+    }
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@napi-rs/cli": "^2.10.0",
+    "ava": "^4.3.0"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "check": "cargo check",
+    "clippy": "cargo clippy",
+    "build": "napi build --platform --release --target aarch64-unknown-linux-gnu",
+    "build:debug": "napi build --platform --target aarch64-unknown-linux-gnu",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "ava",
+    "version": "napi version"
+  }
+}

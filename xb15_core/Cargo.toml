@@ -1,0 +1,22 @@
+[package]
+edition = "2021"
+name = "xb15_core"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "2.6.3", features = ["napi8"] }
+napi-derive = "2.6.0"
+
+# Own libs
+vl53l0x = { version = "=0.0.0", path = "../vl53l0x" }
+gif_parser = { version = "=0.0.0", path = "../gif_parser" }
+
+# Other libs
+rs_ws281x = "0.4.2"
+rpi-led-matrix = "0.4.0"
+
+[build-dependencies]
+napi-build = "2.0.1"

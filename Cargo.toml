@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "xb15_core",
+    "vl53l0x",
+    "led_matrix_test",
+    "gif_parser"
+]
+
+[profile.release]
+lto = true

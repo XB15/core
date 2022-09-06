@@ -1,0 +1,10 @@
+[package]
+name = "led_matrix_test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rpi-led-matrix = "0.4.0"
+clap = { version = "3.2.16", features = ["derive"] }
+
+gif_parser = { version = "=0.0.0", path = "../gif_parser" }
