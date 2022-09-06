@@ -1,0 +1,8 @@
+# This file describes the required parts of the rust toolchain for this project.
+# Providing this file means cargo will automatically use the right toolchain.
+# See also: https://rust-lang.github.io/rustup/overrides.html#overrides
+
+[toolchain]
+channel = "nightly"
+targets = ["aarch64-unknown-linux-gnu"]
+components = [ "rustfmt" ]
