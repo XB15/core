@@ -71,7 +71,11 @@ fn main() -> ! {
         let y = (i / width) as i32;
 
         for display in 0..args.chain_length {
-          let x = ((i % width) + (width * display as usize)) as i32;
+          let x = if display % 2 == 0 {
+            ((i % width) + (width * display as usize)) as i32
+          } else {
+            ((width - (i % width)) + (width * display as usize)) as i32
+          };
 
           canvas.set(x, y, &color);
         }
