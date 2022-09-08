@@ -20,6 +20,8 @@ struct Args {
   chain_length: u32,
   #[clap(short = 's', long, default_value = "RGB")]
   rgb_sequence: String,
+  #[clap(short = 'm', long, default_value = "0")]
+  mirrored: u32,
 }
 
 fn main() -> ! {
@@ -34,6 +36,8 @@ fn main() -> ! {
   } else {
     "adafruit-hat"
   });
+
+  options.set_pixel_mapper_config("Mirror");
 
   options.set_cols(args.cols);
   options.set_rows(args.rows);
@@ -71,7 +75,7 @@ fn main() -> ! {
         let y = (i / width) as i32;
 
         for display in 0..args.chain_length {
-          let x = if display % 2 == 0 {
+          let x = if display % 2 == args.mirrored {
             ((i % width) + (width * display as usize)) as i32
           } else {
             ((width - (i % width)) + (width * display as usize)) as i32
