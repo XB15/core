@@ -1,5 +1,6 @@
 # XB15 Core
-Coming soon...
+
+Repository for the XB15 core.
 
 ## License
 All code in this repository is dual-licensed under either:
