@@ -2,6 +2,7 @@
 edition = "2021"
 name = "xb15_core"
 version = "0.0.0"
+license = "MIT OR Apache-2.0"
 
 [lib]
 crate-type = ["cdylib"]
