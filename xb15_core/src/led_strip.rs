@@ -21,7 +21,7 @@ impl LedStrip {
       .build();
 
     match rs_ws281x::ControllerBuilder::new()
-      .channel(1, channel)
+      .channel(0, channel)
       .build()
     {
       Ok(controller) => Ok(Self {

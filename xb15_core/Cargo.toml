@@ -9,13 +9,13 @@ crate-type = ["cdylib"]
 [dependencies]
 napi = { version = "2.6.3", features = ["napi8"] }
 napi-derive = "2.6.0"
+rs_ws281x = { git = "https://github.com/akrantz01/rpi-ws281x-rust", branch = "update-submodule" }
 
 # Own libs
 vl53l0x = { version = "=0.0.0", path = "../vl53l0x" }
 gif_parser = { version = "=0.0.0", path = "../gif_parser" }
 
 # Other libs
-rs_ws281x = "0.4.2"
 rpi-led-matrix = "0.4.0"
 
 [build-dependencies]
