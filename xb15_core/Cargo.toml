@@ -13,7 +13,7 @@ napi-derive = "2.6.0"
 rs_ws281x = { git = "https://github.com/akrantz01/rpi-ws281x-rust", branch = "update-submodule" }
 
 # Own libs
-vl53l0x = { version = "=0.0.0", path = "../vl53l0x" }
+tof = { version = "=0.0.0", path = "../tof" }
 gif_parser = { version = "=0.0.0", path = "../gif_parser" }
 
 # Other libs

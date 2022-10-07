@@ -1,0 +1,11 @@
+[package]
+name = "tof"
+version = "0.0.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+rppal = "0.13.1"
+cast = "0.3.0"
+vl53l0x = "0.3"
+eyre = "0.6"
