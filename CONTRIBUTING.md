@@ -9,7 +9,7 @@
 - Download the included file `docker.sh` (start this file before starting each time!)
 - Clone the `Core` [repository](https://github.com/XB15/core)
 - Navigate to the core in your WSL window: `cd core`
-- Build and tag the docker image: `docker build -t xb15_core .`
+- Build and tag the Docker image: `docker build -t xb15_core .`
 - Execute command: `docker run -it -v $PWD:/app xb15_core bash`
 - `cd /app`
 - `./wrap_for_aarch64.sh cargo build -p led_matrix_test --bin gif --release --target aarch64-unknown-linux-gnu`
