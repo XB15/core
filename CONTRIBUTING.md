@@ -1,6 +1,5 @@
 # How to build
 
-## First time steps
 
 - Enable [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) on your system
 - Install [Microsoft Terminal](https://apps.microsoft.com/store/detail/windows-terminal/9N0DX20HK701?hl=nl-nl&gl=nl) (optional)
