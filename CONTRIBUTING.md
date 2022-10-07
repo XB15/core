@@ -7,7 +7,7 @@
 - Set up your WSL enviroment with a username and pw
 - Install Docker: https://docs.docker.com/engine/install/
 - Download the included file `docker.sh` (start this file before starting each time!)
-- Clone the `Core` [repository](https://github.com/XB15/core)
+- Clone the `Core` [repository](https://github.com/XB15/core): `git clone https://github.com/XB15/core`
 - Navigate to the core in your WSL window: `cd core`
 - Build and tag the Docker image: `docker build -t xb15_core .`
 - Execute command: `docker run -it -v $PWD:/app xb15_core bash`
