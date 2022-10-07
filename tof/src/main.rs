@@ -1,30 +1,19 @@
-use eyre::{Result, WrapErr};
-use rppal::i2c;
+use eyre::WrapErr;
+use rppal::i2c::I2c;
 use vl53l0x::VL53L0x;
 
+const DEFAULT_ADDRESS: u16 = 0x29;
+
 fn main() -> eyre::Result<()> {
-  let mut i2c = dbg!(I2c::with_bus(1)?);
+  let mut i2c = I2c::with_bus(1).wrap_err("Error while setting bus")?;
+  i2c
+    .set_slave_address(DEFAULT_ADDRESS)
+    .wrap_err("Error while setting address")?;
+  let mut tof = VL53L0x::new(i2c).unwrap();
+  println!("chip initialized");
 
-  dbg!(i2c.set_slave_address(address)?);
-  let mut chip = VL53L0x::new(I2c).unwrap();
-  let wai = dbg!(chip.who_am_i()?);
-  if wai == 0xEE {
-    dbg!(chip.init_hardware()?);
-    // FIXME: return an error/optional
-    /*
-    chip.set_high_i2c_voltage(); // TODO: make configurable
-    chip.revision_id = chip.read_revision_id();
-    chip.reset();
-    chip.set_high_i2c_voltage();
-    chip.set_standard_i2c_mode(); // TODO: make configurable
-     */
-  } else {
-    panic!("invalid device: {wai}")
-  }
-
-  println!("test");
-  chip.set_measurement_timing_budget(200_000).unwrap();
-  chip.start_continuous(20).unwrap();
+  tof.set_measurement_timing_budget(20_000).unwrap();
+  tof.start_continuous(0).unwrap();
 
   loop {
     match tof.read_range_continuous_millimeters_blocking() {

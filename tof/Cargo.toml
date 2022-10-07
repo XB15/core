@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-rppal = "0.13.1"
+rppal = { version = "0.13.1", features = ["hal"] }
 cast = "0.3.0"
 vl53l0x = "0.3"
 eyre = "0.6"
