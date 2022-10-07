@@ -9,7 +9,8 @@
 
 - download the included file docker.sh (start this file before starting each time!)
 - Clone the `Core` [repository](https://github.com/XB15/core)
-- Navigate to the core in your WSL window: `cd/../../core`
+- Navigate to the core in your WSL window: `cd ../../core`
+
 - Build and tag the docker image: `docker build -t xb15_core .`
 - Execute command: `docker run -it -v $PWD:/app xb15_core bash`
 - `cd /app`
