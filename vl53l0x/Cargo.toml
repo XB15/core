@@ -1,9 +1,0 @@
-[package]
-name = "vl53l0x"
-version = "0.0.0"
-edition = "2021"
-license = "MIT OR Apache-2.0"
-
-[dependencies]
-rppal = "0.13.1"
-cast = "0.3.0"
