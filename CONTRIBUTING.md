@@ -6,7 +6,6 @@
 - Install a subsystem (I prefer [Ubuntu](https://apps.microsoft.com/store/detail/ubuntu-22041-lts/9PN20MSR04DW))
 - Set up your WSL enviroment with a username and pw
 - Install Docker: https://docs.docker.com/engine/install/
-
 - download the included file docker.sh (start this file before starting each time!)
 - Clone the `Core` [repository](https://github.com/XB15/core)
 - Navigate to the core in your WSL window: `cd ../../core`
