@@ -20,14 +20,16 @@ struct Args {
   chain_length: u32,
   #[clap(short = 's', long, default_value = "RGB")]
   rgb_sequence: String,
-  #[clap(short = 'm', long, default_value = "0")]
-  mirror: u32,
+  #[clap(short = 'm', long, takes_value = false)]
+  mirror: bool,
 }
 
 fn main() -> ! {
   // have to do this type assert here because proc macros are broken in rust analyzer atm
   // thanks rust :/
   let args: Args = Args::parse();
+
+  println!("{:?}", args);
 
   let mut options = LedMatrixOptions::new();
   options.set_hardware_pulsing(args.pwm);
@@ -73,11 +75,7 @@ fn main() -> ! {
         let y = (i / width) as i32;
 
         for display in 0..args.chain_length {
-          let x = if display % 2 == args.mirror {
-            ((i % width) + (width * display as usize)) as i32
-          } else {
-            ((width - (i % width)) + (width * display as usize)) as i32
-          };
+          let x = calculate_x(args.mirror, display, i, width);
 
           canvas.set(x, y, &color);
         }
@@ -87,5 +85,19 @@ fn main() -> ! {
 
       sleep(frame.delay);
     }
+  }
+}
+
+fn calculate_x(should_mirror: bool, display: u32, i: usize, width: usize) -> i32 {
+  let x = i % width;
+
+  if !should_mirror {
+    return x as i32;
+  }
+
+  if display % 2 == 0 {
+    (x + (width * display as usize)) as i32
+  } else {
+    ((width - x - 1) + (width * display as usize)) as i32
   }
 }
