@@ -21,7 +21,15 @@ fn main() {
   let mouth_frames = parse_gif(cli.mouth.as_str()).unwrap();
   let nose_frames = parse_gif(cli.nose.as_str()).unwrap();
 
-  let mut composer = Composer::new(eye_frames, mouth_frames, nose_frames);
+  let mut composer = Composer::new(
+    64,
+    32,
+    vec![
+      Box::new(new_composer::tracks::GifTrack::new(eye_frames)),
+      Box::new(new_composer::tracks::GifTrack::new(mouth_frames)),
+      Box::new(new_composer::tracks::GifTrack::new(nose_frames)),
+    ],
+  );
 
   loop {
     let frame = composer.next_frame();
@@ -36,8 +44,8 @@ fn main() {
 
       // Format as 24 bit color escape sequences
       pixels[y][x] = match pixel {
-        Pixel::Transparent => "\x1B[38;2;0;0;0m \x1B[0m".to_string(),
-        Pixel::Colored(r, g, b) => format!("\x1B[38;2;{};{};{}m█\x1B[0m", r, g, b),
+        Pixel(r, g, b, true) => format!("\x1B[38;2;{};{};{}m█\x1B[0m", r, g, b),
+        Pixel(_, _, _, false) => "\x1b[38;2;0;0;0m \x1B[0m".to_string(),
       };
     }
 

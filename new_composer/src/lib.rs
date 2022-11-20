@@ -1,28 +1,47 @@
-use gif_parser::Pixel;
+pub mod tracks;
 
-pub fn compose(
-  height: usize,
-  width: usize,
-  eye: gif_parser::FramePixels,
-  mouth: gif_parser::FramePixels,
-  nose: gif_parser::FramePixels,
-) -> gif_parser::FramePixels {
+use std::time::Duration;
+
+use gif_parser::Pixel;
+use tracks::Track;
+
+fn compose(height: usize, width: usize, frames: Vec<gif_parser::Frame>) -> gif_parser::FramePixels {
   let mut pixels =
-    gif_parser::FramePixels::new(height, width, vec![Pixel::Transparent; height * width]);
+    gif_parser::FramePixels::new(height, width, vec![Pixel(0, 0, 0, false); height * width]);
 
   for y in 0..height {
     for x in 0..width {
-      if let Some(Pixel::Colored(r, g, b)) = eye.get_pixel(x, y) {
-        pixels.write_pixel(x, y, Pixel::Colored(r, g, b));
-      }
+      let non_transparent_pixels = frames
+        .iter()
+        .map(|frame| {
+          frame
+            .pixels
+            .get_pixel(x, y)
+            .unwrap_or(gif_parser::TRANSPARENT)
+        })
+        .filter(|pixel| pixel.3)
+        .collect::<Vec<_>>();
 
-      if let Some(Pixel::Colored(r, g, b)) = mouth.get_pixel(x, y) {
-        pixels.write_pixel(x, y, Pixel::Colored(r, g, b));
-      }
+      pixels.write_pixel(
+        x,
+        y,
+        if non_transparent_pixels.len() > 0 {
+          let (r, g, b) = non_transparent_pixels
+            .iter()
+            .fold((0, 0, 0), |(r, g, b), pixel| {
+              (r + pixel.0, g + pixel.1, b + pixel.2)
+            });
 
-      if let Some(Pixel::Colored(r, g, b)) = nose.get_pixel(x, y) {
-        pixels.write_pixel(x, y, Pixel::Colored(r, g, b));
-      }
+          gif_parser::Pixel(
+            r / non_transparent_pixels.len() as u8,
+            g / non_transparent_pixels.len() as u8,
+            b / non_transparent_pixels.len() as u8,
+            true,
+          )
+        } else {
+          gif_parser::TRANSPARENT
+        },
+      );
     }
   }
 
@@ -30,52 +49,35 @@ pub fn compose(
 }
 
 pub struct Composer {
-  eye: Vec<gif_parser::Frame>,
-  eye_frame: usize,
-  mouth: Vec<gif_parser::Frame>,
-  mouth_frame: usize,
-  nose: Vec<gif_parser::Frame>,
-  nose_frame: usize,
+  height: usize,
+  width: usize,
+  tracks: Vec<Box<dyn Track>>,
+  min_delay: Duration,
 }
 
 impl Composer {
-  pub fn new(
-    eye: Vec<gif_parser::Frame>,
-    mouth: Vec<gif_parser::Frame>,
-    nose: Vec<gif_parser::Frame>,
-  ) -> Self {
+  pub fn new(width: usize, height: usize, tracks: Vec<Box<dyn Track>>) -> Self {
+    // TODO: Figure out the smallest common divisor of all the tracks' min_delay
+    let min_delay = tracks.iter().map(|track| track.min_delay()).min().unwrap();
+
     Self {
-      eye,
-      eye_frame: 0,
-      mouth,
-      mouth_frame: 0,
-      nose,
-      nose_frame: 0,
+      height,
+      width,
+      tracks,
+      min_delay,
     }
   }
 
   pub fn next_frame(&mut self) -> gif_parser::Frame {
-    let eye = &self.eye[self.eye_frame];
-    let mouth = &self.mouth[self.mouth_frame];
-    let nose = &self.nose[self.nose_frame];
-
     let pixels = compose(
-      eye.pixels.height(),
-      eye.pixels.width(),
-      eye.pixels.clone(),
-      mouth.pixels.clone(),
-      nose.pixels.clone(),
+      self.height,
+      self.width,
+      self.tracks.iter_mut().map(|gif| gif.next_frame()).collect(),
     );
 
-    let frame = gif_parser::Frame {
+    gif_parser::Frame {
       pixels,
-      delay: eye.delay,
-    };
-
-    self.eye_frame = (self.eye_frame + 1) % self.eye.len();
-    self.mouth_frame = (self.mouth_frame + 1) % self.mouth.len();
-    self.nose_frame = (self.nose_frame + 1) % self.nose.len();
-
-    frame
+      delay: self.min_delay,
+    }
   }
 }

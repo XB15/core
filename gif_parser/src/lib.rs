@@ -4,10 +4,17 @@ use gif_dispose::RGBA8;
 use imgref::ImgVec;
 
 #[derive(Copy, Clone, PartialEq)]
-pub enum Pixel {
-  Colored(u8, u8, u8),
-  Transparent,
-}
+pub struct Pixel(
+  /// red
+  pub u8,
+  /// green
+  pub u8,
+  /// blue
+  pub u8,
+  /// determines if the pixel should be render or not
+  pub bool,
+);
+pub const TRANSPARENT: Pixel = Pixel(0, 0, 0, false);
 
 #[derive(Clone)]
 pub struct FramePixels {
@@ -71,9 +78,9 @@ impl From<&ImgVec<RGBA8>> for FramePixels {
         let alpha: &u8 = pixel.a.borrow();
 
         if *alpha > 0 {
-          data.push(Pixel::Colored(red, green, blue));
+          data.push(Pixel(red, green, blue, true));
         } else {
-          data.push(Pixel::Transparent);
+          data.push(Pixel(0, 0, 0, false));
         }
       }
     }

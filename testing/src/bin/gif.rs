@@ -28,8 +28,8 @@ fn main() {
 
         // Format as 24 bit color escape sequences
         pixels[y][x] = match pixel {
-          Pixel::Transparent => "\x1B[38;2;0;0;0m \x1B[0m".to_string(),
-          Pixel::Colored(r, g, b) => format!("\x1B[38;2;{};{};{}m█\x1B[0m", r, g, b),
+          Pixel(r, g, b, true) => format!("\x1B[38;2;{};{};{}m█\x1B[0m", r, g, b),
+          Pixel(_, _, _, false) => "\x1b[38;2;0;0;0m \x1B[0m".to_string(),
         };
       }
 
