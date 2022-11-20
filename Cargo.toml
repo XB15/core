@@ -2,10 +2,12 @@
 resolver = "2" # As of Nov 2021, rust doesn't use new resolver if you don't specify this
 
 members = [
-    "xb15_core",
-    "tof",
-    "led_matrix_test",
-    "gif_parser"
+  "xb15_core",
+  "tof",
+  "led_matrix_test",
+  "gif_parser",
+  "new_composer",
+  "testing",
 ]
 
 [profile.release]

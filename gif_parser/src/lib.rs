@@ -3,8 +3,13 @@ use std::borrow::Borrow;
 use gif_dispose::RGBA8;
 use imgref::ImgVec;
 
-pub struct Pixel(pub u8, pub u8, pub u8);
+#[derive(Copy, Clone, PartialEq)]
+pub enum Pixel {
+  Colored(u8, u8, u8),
+  Transparent,
+}
 
+#[derive(Clone)]
 pub struct FramePixels {
   height: usize,
   width: usize,
@@ -31,6 +36,20 @@ impl FramePixels {
   pub fn pixels(&self) -> &[Pixel] {
     &self.data
   }
+
+  pub fn write_pixel(&mut self, x: usize, y: usize, pixel: Pixel) {
+    let offset = (y * self.width + x) as usize;
+    self.data[offset] = pixel;
+  }
+
+  pub fn get_pixel(&self, x: usize, y: usize) -> Option<Pixel> {
+    let offset = (y * self.width + x) as usize;
+    if offset < self.data.len() {
+      Some(self.data[offset])
+    } else {
+      None
+    }
+  }
 }
 
 impl From<&ImgVec<RGBA8>> for FramePixels {
@@ -52,9 +71,9 @@ impl From<&ImgVec<RGBA8>> for FramePixels {
         let alpha: &u8 = pixel.a.borrow();
 
         if *alpha > 0 {
-          data.push(Pixel(red, green, blue));
+          data.push(Pixel::Colored(red, green, blue));
         } else {
-          data.push(Pixel(0, 0, 0));
+          data.push(Pixel::Transparent);
         }
       }
     }
@@ -63,6 +82,7 @@ impl From<&ImgVec<RGBA8>> for FramePixels {
   }
 }
 
+#[derive(Clone)]
 pub struct Frame {
   pub pixels: FramePixels,
   pub delay: std::time::Duration,

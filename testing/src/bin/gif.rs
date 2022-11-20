@@ -7,12 +7,12 @@ use gif_parser::*;
 struct Args {
   #[clap(short, long, default_value = "test.gif")]
   gif: String,
+  #[clap(short, long, default_value = "false")]
+  new_composer: bool,
 }
 
 fn main() {
-  // have to do this type assert here because proc macros are broken in rust analyzer atm
-  // thanks rust :/
-  let cli: Args = Args::parse();
+  let cli = Args::parse();
 
   let frames = parse_gif(cli.gif.as_str()).unwrap();
 
@@ -27,7 +27,10 @@ fn main() {
         let y = i / width;
 
         // Format as 24 bit color escape sequences
-        pixels[y][x] = format!("\x1B[38;2;{};{};{}m█\x1B[0m", pixel.0, pixel.1, pixel.2);
+        pixels[y][x] = match pixel {
+          Pixel::Transparent => "\x1B[38;2;0;0;0m \x1B[0m".to_string(),
+          Pixel::Colored(r, g, b) => format!("\x1B[38;2;{};{};{}m█\x1B[0m", r, g, b),
+        };
       }
 
       let pixels = pixels
