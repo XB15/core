@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use clap::Parser;
 
 use gif_parser::*;
@@ -25,42 +27,40 @@ fn main() {
     64,
     32,
     vec![
-      Box::new(new_composer::tracks::GifTrack::new(eye_frames)),
-      Box::new(new_composer::tracks::GifTrack::new(mouth_frames)),
-      Box::new(new_composer::tracks::GifTrack::new(nose_frames)),
+      new_composer::tracks::GifTrack::new(eye_frames),
+      new_composer::tracks::GifTrack::new(mouth_frames),
+      new_composer::tracks::GifTrack::new(nose_frames),
     ],
   );
 
+  let start = std::time::Instant::now();
   loop {
-    let frame = composer.next_frame();
+    let pixels = composer.get_pixels_at(std::time::Instant::now() - start);
 
-    let width = frame.pixels.width();
-    let height = frame.pixels.height();
-    let mut pixels = vec![vec![String::default(); width]; height];
+    let width = pixels.width();
+    let height = pixels.height();
+    let mut framebuffer = vec![vec![String::default(); width]; height];
 
-    for (i, pixel) in frame.pixels.pixels().iter().enumerate() {
+    for (i, pixel) in pixels.pixels().iter().enumerate() {
       let x = i % width;
       let y = i / width;
 
       // Format as 24 bit color escape sequences
-      pixels[y][x] = match pixel {
+      framebuffer[y][x] = match pixel {
         Pixel(r, g, b, true) => format!("\x1B[38;2;{};{};{}m█\x1B[0m", r, g, b),
         Pixel(_, _, _, false) => "\x1b[38;2;0;0;0m \x1B[0m".to_string(),
       };
     }
 
-    let pixels = pixels
+    let framebuffer = framebuffer
       .iter()
       .map(|row| row.join(""))
       .collect::<Vec<String>>()
       .join("\n");
 
-    // Clear the screen
-    print!("\x1B[2J");
+    // Clear the screen and print the pixels
+    println!("\x1B[2J{}", framebuffer);
 
-    // Print the pixels
-    println!("{}", pixels);
-
-    std::thread::sleep(frame.delay);
+    std::thread::sleep(Duration::from_millis(5));
   }
 }

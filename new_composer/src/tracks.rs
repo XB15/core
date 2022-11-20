@@ -1,35 +1,54 @@
 use std::time::Duration;
 
-use gif_parser::Frame;
+use gif_parser::{Frame, FramePixels};
 
-pub trait Track {
-  fn next_frame(&mut self) -> Frame;
-  fn min_delay(&self) -> Duration;
+struct FrameWithTime {
+  pixels: FramePixels,
+  t: Duration,
+  duration: Duration,
 }
 
 pub struct GifTrack {
-  frames: Vec<Frame>,
-  frame_index: usize,
+  frames: Vec<FrameWithTime>,
 }
 
 impl GifTrack {
   pub fn new(frames: Vec<Frame>) -> Self {
+    let mut frames_with_time = Vec::new();
+    let mut t = Duration::from_nanos(0);
+
+    for Frame { delay, pixels } in frames {
+      frames_with_time.push(FrameWithTime {
+        pixels,
+        t,
+        duration: delay,
+      });
+
+      t += delay;
+    }
+
     Self {
-      frames,
-      frame_index: 0,
+      frames: frames_with_time,
     }
   }
-}
 
-impl Track for GifTrack {
-  fn next_frame(&mut self) -> Frame {
-    let frame = self.frames[self.frame_index].clone();
-    self.frame_index = (self.frame_index + 1) % self.frames.len();
+  pub(crate) fn get_pixels_at(&mut self, mut t: Duration) -> FramePixels {
+    if t > self.frames.last().unwrap().t + self.frames.last().unwrap().duration {
+      t = Duration::from_nanos(
+        <u128 as TryInto<u64>>::try_into(t.as_nanos()).unwrap()
+          % <u128 as TryInto<u64>>::try_into(
+            (self.frames.last().unwrap().t + self.frames.last().unwrap().duration).as_nanos(),
+          )
+          .unwrap(),
+      );
+    }
 
-    frame
-  }
+    let frame = self
+      .frames
+      .iter()
+      .find(|frame| frame.t <= t && frame.t + frame.duration > t)
+      .unwrap();
 
-  fn min_delay(&self) -> Duration {
-    self.frames.iter().map(|frame| frame.delay).min().unwrap()
+    frame.pixels.clone()
   }
 }

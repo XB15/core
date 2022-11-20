@@ -15,6 +15,7 @@ pub struct Pixel(
   pub bool,
 );
 pub const TRANSPARENT: Pixel = Pixel(0, 0, 0, false);
+pub const BLACK: Pixel = Pixel(0, 0, 0, true);
 
 #[derive(Clone)]
 pub struct FramePixels {

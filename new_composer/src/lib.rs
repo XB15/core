@@ -2,27 +2,21 @@ pub mod tracks;
 
 use std::time::Duration;
 
-use gif_parser::Pixel;
-use tracks::Track;
+use gif_parser::{FramePixels, Pixel, BLACK, TRANSPARENT};
+use tracks::GifTrack;
 
-fn compose(height: usize, width: usize, frames: Vec<gif_parser::Frame>) -> gif_parser::FramePixels {
-  let mut pixels =
-    gif_parser::FramePixels::new(height, width, vec![Pixel(0, 0, 0, false); height * width]);
+fn compose(height: usize, width: usize, pixels: Vec<FramePixels>) -> gif_parser::FramePixels {
+  let mut new_pixels = FramePixels::new(height, width, vec![TRANSPARENT; height * width]);
 
   for y in 0..height {
     for x in 0..width {
-      let non_transparent_pixels = frames
+      let non_transparent_pixels = pixels
         .iter()
-        .map(|frame| {
-          frame
-            .pixels
-            .get_pixel(x, y)
-            .unwrap_or(gif_parser::TRANSPARENT)
-        })
+        .map(|frame| frame.get_pixel(x, y).unwrap_or(gif_parser::TRANSPARENT))
         .filter(|pixel| pixel.3)
         .collect::<Vec<_>>();
 
-      pixels.write_pixel(
+      new_pixels.write_pixel(
         x,
         y,
         if non_transparent_pixels.len() > 0 {
@@ -32,52 +26,52 @@ fn compose(height: usize, width: usize, frames: Vec<gif_parser::Frame>) -> gif_p
               (r + pixel.0, g + pixel.1, b + pixel.2)
             });
 
-          gif_parser::Pixel(
+          Pixel(
             r / non_transparent_pixels.len() as u8,
             g / non_transparent_pixels.len() as u8,
             b / non_transparent_pixels.len() as u8,
             true,
           )
         } else {
-          gif_parser::TRANSPARENT
+          TRANSPARENT
         },
       );
     }
   }
 
-  pixels
+  new_pixels
 }
 
 pub struct Composer {
   height: usize,
   width: usize,
-  tracks: Vec<Box<dyn Track>>,
-  min_delay: Duration,
+  tracks: Vec<GifTrack>,
+  frame: FramePixels,
 }
 
 impl Composer {
-  pub fn new(width: usize, height: usize, tracks: Vec<Box<dyn Track>>) -> Self {
-    // TODO: Figure out the smallest common divisor of all the tracks' min_delay
-    let min_delay = tracks.iter().map(|track| track.min_delay()).min().unwrap();
-
+  pub fn new(width: usize, height: usize, tracks: Vec<GifTrack>) -> Self {
     Self {
       height,
       width,
       tracks,
-      min_delay,
+      frame: FramePixels::new(height, width, vec![BLACK; height * width]),
     }
   }
 
-  pub fn next_frame(&mut self) -> gif_parser::Frame {
+  pub fn get_pixels_at(&mut self, t: Duration) -> FramePixels {
     let pixels = compose(
       self.height,
       self.width,
-      self.tracks.iter_mut().map(|gif| gif.next_frame()).collect(),
+      self
+        .tracks
+        .iter_mut()
+        .map(|gif| gif.get_pixels_at(t))
+        .collect(),
     );
 
-    gif_parser::Frame {
-      pixels,
-      delay: self.min_delay,
-    }
+    self.frame = pixels.clone();
+
+    pixels
   }
 }
