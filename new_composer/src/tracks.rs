@@ -10,6 +10,7 @@ struct FrameWithTime {
 
 pub struct GifTrack {
   frames: Vec<FrameWithTime>,
+  enabled: bool,
 }
 
 impl GifTrack {
@@ -29,6 +30,7 @@ impl GifTrack {
 
     Self {
       frames: frames_with_time,
+      enabled: true,
     }
   }
 
@@ -50,5 +52,17 @@ impl GifTrack {
       .unwrap();
 
     frame.pixels.clone()
+  }
+
+  pub fn enable(&mut self) {
+    self.enabled = true;
+  }
+
+  pub fn disable(&mut self) {
+    self.enabled = false;
+  }
+
+  pub fn is_enabled(&self) -> bool {
+    self.enabled
   }
 }

@@ -66,6 +66,7 @@ impl Composer {
       self
         .tracks
         .iter_mut()
+        .filter(|t| t.is_enabled())
         .map(|gif| gif.get_pixels_at(t))
         .collect(),
     );
@@ -73,5 +74,13 @@ impl Composer {
     self.frame = pixels.clone();
 
     pixels
+  }
+
+  pub fn enable_track(&mut self, track: usize) {
+    self.tracks[track].enable();
+  }
+
+  pub fn disable_track(&mut self, track: usize) {
+    self.tracks[track].disable();
   }
 }
