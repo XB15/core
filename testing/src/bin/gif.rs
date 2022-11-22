@@ -7,8 +7,6 @@ use gif_parser::*;
 struct Args {
   #[clap(short, long, default_value = "test.gif")]
   gif: String,
-  #[clap(short, long, default_value = "false")]
-  new_composer: bool,
 }
 
 fn main() {

@@ -6,3 +6,4 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 gif_parser = { path = "../gif_parser" }
+thiserror = "1.0"

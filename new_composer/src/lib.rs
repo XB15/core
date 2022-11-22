@@ -1,9 +1,11 @@
-pub mod tracks;
+mod builder;
+mod track;
 
-use std::time::Duration;
+pub use track::Track;
 
+use builder::Builder;
 use gif_parser::{FramePixels, Pixel, BLACK, TRANSPARENT};
-use tracks::GifTrack;
+use std::{collections::HashMap, time::Duration};
 
 fn compose(height: usize, width: usize, pixels: Vec<FramePixels>) -> gif_parser::FramePixels {
   let mut new_pixels = FramePixels::new(height, width, vec![TRANSPARENT; height * width]);
@@ -45,12 +47,18 @@ fn compose(height: usize, width: usize, pixels: Vec<FramePixels>) -> gif_parser:
 pub struct Composer {
   height: usize,
   width: usize,
-  tracks: Vec<GifTrack>,
+  tracks: HashMap<String, Track>,
   frame: FramePixels,
 }
 
 impl Composer {
-  pub fn new(width: usize, height: usize, tracks: Vec<GifTrack>) -> Self {
+  pub fn builder() -> Builder {
+    Builder {
+      tracks: HashMap::new(),
+    }
+  }
+
+  fn new(width: usize, height: usize, tracks: HashMap<String, Track>) -> Self {
     Self {
       height,
       width,
@@ -66,8 +74,7 @@ impl Composer {
       self
         .tracks
         .iter_mut()
-        .filter(|t| t.is_enabled())
-        .map(|gif| gif.get_pixels_at(t))
+        .map(|(_, track)| track.get_pixels_at(t))
         .collect(),
     );
 
@@ -76,11 +83,13 @@ impl Composer {
     pixels
   }
 
-  pub fn enable_track(&mut self, track: usize) {
-    self.tracks[track].enable();
-  }
-
-  pub fn disable_track(&mut self, track: usize) {
-    self.tracks[track].disable();
+  pub fn transition_track_to(&mut self, track: String, animation: String) {
+    // TODO: Error handling
+    self
+      .tracks
+      .get_mut(&track)
+      .unwrap()
+      .transition_to(animation)
+      .unwrap();
   }
 }

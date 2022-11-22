@@ -125,6 +125,8 @@ pub fn parse_gif(path: &str) -> Result<Vec<Frame>, Error> {
     }
     frame.unwrap()
   } {
+    println!("{}", frame.needs_user_input);
+
     if let Err(err) = screen.blit_frame(frame) {
       return Err(Error::GifDispose(err));
     }

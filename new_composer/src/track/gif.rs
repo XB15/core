@@ -8,17 +8,24 @@ struct FrameWithTime {
   duration: Duration,
 }
 
-pub struct GifTrack {
+pub struct Gif {
   frames: Vec<FrameWithTime>,
   enabled: bool,
+  width: usize,
+  height: usize,
 }
 
-impl GifTrack {
+impl Gif {
   pub fn new(frames: Vec<Frame>) -> Self {
     let mut frames_with_time = Vec::new();
     let mut t = Duration::from_nanos(0);
+    let mut width = 0;
+    let mut height = 0;
 
     for Frame { delay, pixels } in frames {
+      width = width.max(pixels.width());
+      height = height.max(pixels.height());
+
       frames_with_time.push(FrameWithTime {
         pixels,
         t,
@@ -31,6 +38,8 @@ impl GifTrack {
     Self {
       frames: frames_with_time,
       enabled: true,
+      width,
+      height,
     }
   }
 
@@ -64,5 +73,13 @@ impl GifTrack {
 
   pub fn is_enabled(&self) -> bool {
     self.enabled
+  }
+
+  pub fn width(&self) -> usize {
+    self.width
+  }
+
+  pub fn height(&self) -> usize {
+    self.height
   }
 }
