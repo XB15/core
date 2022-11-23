@@ -83,7 +83,7 @@ impl Track {
   }
 
   /// Returns the pixels for the frame at the given time `t`.
-  pub fn get_pixels_at(&mut self, t: Duration) -> FramePixels {
+  pub fn get_pixels_at(&self, t: Duration) -> FramePixels {
     FramePixels::new(
       self.height,
       self.width,

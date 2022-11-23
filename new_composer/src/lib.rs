@@ -1,10 +1,10 @@
 mod builder;
 mod track;
 
-pub use track::Track;
+pub use track::{Gif, Track};
 
 use builder::Builder;
-use gif_parser::{FramePixels, Pixel, BLACK, TRANSPARENT};
+use gif_parser::{FramePixels, Pixel, TRANSPARENT};
 use std::{collections::HashMap, time::Duration};
 
 fn compose(height: usize, width: usize, pixels: Vec<FramePixels>) -> gif_parser::FramePixels {
@@ -48,7 +48,6 @@ pub struct Composer {
   height: usize,
   width: usize,
   tracks: HashMap<String, Track>,
-  frame: FramePixels,
 }
 
 impl Composer {
@@ -63,31 +62,28 @@ impl Composer {
       height,
       width,
       tracks,
-      frame: FramePixels::new(height, width, vec![BLACK; height * width]),
     }
   }
 
-  pub fn get_pixels_at(&mut self, t: Duration) -> FramePixels {
+  pub fn get_pixels_at(&self, t: Duration) -> FramePixels {
     let pixels = compose(
       self.height,
       self.width,
       self
         .tracks
-        .iter_mut()
+        .iter()
         .map(|(_, track)| track.get_pixels_at(t))
         .collect(),
     );
 
-    self.frame = pixels.clone();
-
     pixels
   }
 
-  pub fn transition_track_to(&mut self, track: String, animation: String) {
+  pub fn transition_track_to(&mut self, track: impl ToString, animation: impl ToString) {
     // TODO: Error handling
     self
       .tracks
-      .get_mut(&track)
+      .get_mut(&track.to_string())
       .unwrap()
       .transition_to(animation)
       .unwrap();

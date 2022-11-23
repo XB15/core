@@ -43,7 +43,7 @@ impl Gif {
     }
   }
 
-  pub(crate) fn get_pixels_at(&mut self, mut t: Duration) -> FramePixels {
+  pub(crate) fn get_pixels_at(&self, mut t: Duration) -> FramePixels {
     if t > self.frames.last().unwrap().t + self.frames.last().unwrap().duration {
       t = Duration::from_nanos(
         <u128 as TryInto<u64>>::try_into(t.as_nanos()).unwrap()
