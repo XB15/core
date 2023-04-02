@@ -24,15 +24,20 @@ fn main() {
   let mouth_frames = parse_gif(cli.mouth.as_str()).unwrap();
   let nose_frames = parse_gif(cli.nose.as_str()).unwrap();
 
-  let mut composer = Composer::new(
-    64,
-    32,
-    vec![
-      new_composer::tracks::GifTrack::new(eye_frames),
-      new_composer::tracks::GifTrack::new(mouth_frames),
-      new_composer::tracks::GifTrack::new(nose_frames),
-    ],
-  );
+  let composer = Composer::builder()
+    .add_track(
+      "eye",
+      new_composer::Track::with_idle_animation(new_composer::Gif::new(eye_frames)).build(),
+    )
+    .add_track(
+      "mouth",
+      new_composer::Track::with_idle_animation(new_composer::Gif::new(mouth_frames)).build(),
+    )
+    .add_track(
+      "nose",
+      new_composer::Track::with_idle_animation(new_composer::Gif::new(nose_frames)).build(),
+    )
+    .build();
 
   let mut window = RenderWindow::new(
     (64 * cli.magnification as u32, 32 * cli.magnification as u32),
