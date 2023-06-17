@@ -12,12 +12,16 @@ RUN apt-get update \
 #        libc++abi-dev \
         gcc-multilib \
     && apt-get install -y \
+        gcc-arm-linux-gnueabihf \
+        g++-arm-linux-gnueabihf \
         gcc-aarch64-linux-gnu \
         g++-aarch64-linux-gnu
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y \
     && . "$HOME/.cargo/env" \
     && rustup toolchain install nightly \
+    && rustup target add arm-unknown-linux-gnueabihf \
+    && rustup target add armv7-unknown-linux-gnueabihf \
     && rustup target add aarch64-unknown-linux-gnu
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash \
